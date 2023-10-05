@@ -1,21 +1,6 @@
+import { MongoClient } from "mongodb";
 import MeetupList from "@/components/meetups/MeetupList";
 
-const DUMMY_MEETUPS = [
-    {
-      id: 'm1',
-      title: 'A First Meetup',
-      image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Stadtbild_M%C3%BCnchen.jpg/1280px-Stadtbild_M%C3%BCnchen.jpg',
-      address: 'Some address 5, 12345 Some City',
-      description: 'This is a first meetup!'
-    },
-    {
-      id: 'm2',
-      title: 'A Second Meetup',
-      image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Stadtbild_M%C3%BCnchen.jpg/1280px-Stadtbild_M%C3%BCnchen.jpg',
-      address: 'Some address 10, 12345 Some City',
-      description: 'This is a second meetup!'
-    }
-  ];
 
 const HomePage =(props)=>{
     return(
@@ -40,11 +25,25 @@ const HomePage =(props)=>{
 // runs for every number of seconds / effecient for data changing unfrequently 
 // data and page is cached and stored and it will be reused 
 export const getStaticProps=async()=>{
+  const client = await MongoClient.connect('mongodb+srv://samaan:IoliZqYzwDxNiH7I@meetups.nzp8ytk.mongodb.net/?retryWrites=true&w=majority&appName=AtlasApp');
+  const db = client.db();
+
+  const meetupsCollection = db.collection('meetups');
+
+  const meetups = await meetupsCollection.find().toArray();
+
+  client.close();
+
   return {
       props:{
-        meetups:DUMMY_MEETUPS
+        meetups:meetups.map((meetup)=>({
+          title:meetup.title,
+          address: meetup.address,
+          image: meetup.image,
+          id: meetup._id.toString()
+        }))
       },
-      revalidate:10
+      revalidate:1
   };
 };
 

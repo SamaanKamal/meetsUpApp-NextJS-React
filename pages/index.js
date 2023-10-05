@@ -17,10 +17,35 @@ const DUMMY_MEETUPS = [
     }
   ];
 
-const HomePage =()=>{
+const HomePage =(props)=>{
     return(
-    <MeetupList meetups={DUMMY_MEETUPS} />
+    <MeetupList meetups={props.meetups} />
     );
+};
+
+
+// runs on the server 
+// runs for every incoming request / effecient for data changing frequently
+// export const getServerSideProps=(context)=>{
+//   const req = context.req;
+//   const res = context.res;
+//   return {
+//     props:{
+//       meetups:DUMMY_MEETUPS
+//     },
+//   };
+// };
+
+// runs after deployment 
+// runs for every number of seconds / effecient for data changing unfrequently 
+// data and page is cached and stored and it will be reused 
+export const getStaticProps=async()=>{
+  return {
+      props:{
+        meetups:DUMMY_MEETUPS
+      },
+      revalidate:10
+  };
 };
 
 export default HomePage;
